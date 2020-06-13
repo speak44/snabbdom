@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document</title>
+</head>
+<body>
+  <div id="app"></div>
+</body>
+<script src="./node_modules/snabbdom/dist/snabbdom.js"></script>
+<script>
+  // 测试 h函数，patch方法
+  function defineReactive(obj,key,val){
+    Object.defineProperty(obj,key,{
+      get(){
+        return val
+      },
+      set(v){
+        val=v
+        updated()
+      }
+    })
+  }
+  const obj= {}
+  defineReactive(obj,'foo','')
+
+  //将obj的值直接放在app里面
+  // 使用snabbdom 
+  const {init, h} =snabbdom
+  //init([]) 里面放一些操作函数
+  const path =init([])
+  // 存一下oldvnode 上一次的渲染结果
+  let vnode
+  function updated() {
+
+    if(!vnode){ //如果 vnode 不存在，初始化周期
+      vnode=path(app,render()) //app 没定义可以直接使用是因为在chome浏览器的配置， id 可以直接使用
+    }else{// 更新周期
+      vnode=path(vnode,render())
+    }
+  }
+  // 写一个能描述当前dome节点的函数
+  function render(){
+    return h('div', obj.foo)
+  }
+  //上面为框架内容
+  // 下面 业务逻辑
+   setInterval(() => {
+     obj.foo = new Date().toLocaleTimeString()
+   }, 1000);
+</script>
+</html>
